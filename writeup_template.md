@@ -46,12 +46,10 @@ You're reading it!
 The generic `get_hog_features` function allows the HOG features extraction from an input image according to the orientation, number of pixels per cell and number of cells per block parameters. 
 
 The parameters I used are:
-* Image color space `YCrCb`: after several experimentations, this color space proved to give best accuracy results. 
-* orientation `9`: default value
-* pixels per cell `8`: default value 
-* cells per block `1`: reduced from `2` in order to reduce the overall feature vector length, to minimize possible over-fitting.
-
-Besides, HOG features are extracted for all 3 channels in order to get maximum value of the car (or non car object) shapes in the different channels. 
+* Image color space: `YCrCb`
+* orientation: `9`
+* pixels per cell: `8`
+* cells per block: `1`
 
 Here is an example of one of each of the `vehicle` and `non-vehicle` classes, with respective conversion to YCrCb color space and extracted HOG features:
 
@@ -65,7 +63,13 @@ Here is an example of one of each of the `vehicle` and `non-vehicle` classes, wi
 
 #### 2. Explain how you settled on your final choice of HOG parameters.
 
-I tried various combinations of parameters and...
+I chose the `YCrCb` color space as this was giving me the best accuracy results after several experimentations on different color spaces.
+
+I kept the default values for orientation and pixels per cell.
+
+However I reduced cells per block from `2` to `1` in order to reduce the overall feature vector length, and so to minimize possible over-fitting.
+
+Finally, I extracted HOG features for all 3 channels in order to get maximum value of the car (or non car object) shapes in the different channels. 
 
 ####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
