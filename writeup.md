@@ -20,9 +20,9 @@ The goals / steps of this project are the following:
 [image8]: ./output_images/color_17.png "Color features extracted from the car image"
 [image9]: ./output_images/spatial_extra40.png "Spatial features extracted from the non car image"
 [image10]: ./output_images/color_extra40.png "Color features extracted from the non car image"
-[image1]: ./examples/car_not_car.png
-[image1]: ./examples/car_not_car.png
-[image1]: ./examples/car_not_car.png
+[image11]: ./test_images/test1.jpg "Test image"
+[image12]: ./output_images/boxes_test1.jpg "Sliding window applied on test image"
+[image13]: ./output_images/final_test1.jpg "Final car detection on test image"
 [image1]: ./examples/car_not_car.png
 [image1]: ./examples/car_not_car.png
 [image2]: ./examples/HOG_example.jpg
@@ -104,20 +104,27 @@ Here are visual examples of the 2 feature vectors extracted:
 
 The "Train classifier" code cell contains code to train an SVC classifier, with the default 'rbf' method, but a large C (1e8) and low gamma (4e-4) in order to improve accuracy.
 
-###Sliding Window Search
+### Sliding Window Search
 
-####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
+#### 1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?
 
-I decided to search random window positions at random scales all over the image and came up with this (ok just kidding I didn't actually ;):
+The function `process_image` contains the code for the pipeline that applies a sliding window search and runs the trained classifier to detect cars in an image. This function eventually calls the `slide_window` function, which creates all search windows to apply, and the `search_windows` which extracts the features from each search window.
 
-![alt text][image3]
+A full search is applied at start when no prior information is known from the image. I have used a wide number of scales to be sure to detect cars: 32, 64, 96, 128, 160, 192, 224
 
-####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
+For the smaller sizes, I restricted the x / y start and stop positions in order to avoid too much processing time, given that small cars are usually detected further away closer to horizon and towards the center of the image. The search window is widened as the image size increases.
 
-Ultimately I searched on two scales using YCrCb 3-channel HOG features plus spatially binned color and histograms of color in the feature vector, which provided a nice result.  Here are some example images:
+False positives are eliminated by computing a heatmap from all the positive results of the classifier, and then applying a threshold (set to 1) on the heatmap in order to eliminate areas where 1 single window was found erroneously as a match. The resulting superimposed matched windows define a minimum box which is drawn on the original image. 
 
-![alt text][image4]
----
+#### 2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?
+
+Here is an example of the detection of cars through sliding window on a test image:
+
+![image11]
+
+![image12]
+
+![image13]
 
 ### Video Implementation
 
@@ -126,6 +133,12 @@ Here's a [link to my video result](./project_video.mp4)
 
 
 ####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
+
+
+The function `process_image_zones` is a slightly more generic function which performs the detection given arguments such as arrays of window sizes, x / y start and stop positions and threshold.
+
+
+
 
 I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
 
