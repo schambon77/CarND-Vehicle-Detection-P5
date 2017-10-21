@@ -128,39 +128,23 @@ Here is an example of the detection of cars through sliding window on a test ima
 
 ### Video Implementation
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
+Here's a [link to my video result](./output_images/detected_vehicles_project_video.mp4)
 
 
-####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
+#### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
+For the video, I introduced some tracking of detected cars. This started by the implementation of the `Car` class, which contains a queue (max length 10) for all final ovelapping windows found, and can return an average of the overlapping windows. This is done to smooth the bounding window drawing around the detected cars.
 
-The function `process_image_zones` is a slightly more generic function which performs the detection given arguments such as arrays of window sizes, x / y start and stop positions and threshold.
+The function `process_image_zones` was added in order to handle 2 types of search:
+* at start, and every 10 frames, a full searchas described before is performed. The resulting bounding windows are added to already detected cars based on the max overlap, or a new Car object is created if no overlap with existing car was found.
+* for other frames, a much reduced search around each known Car location is performed within a margin (set to 25 pixels) in each direction. This speeds up the video processing, and reduces the risk to get false positives as the search space is reduced.
 
+### Discussion
 
+#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
-
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
-
-### Here are six frames and their corresponding heatmaps:
-
-![alt text][image5]
-
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
-
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
-
-
-
----
-
-###Discussion
-
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
-
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
-
+Here are a few discussion points I'd like to bring up:
+* The main challenge I faced in this problem was the classifier training. This is mainly due to the fact that my feature vector was very long (over 8000 features), and my classifier was over-fitting. Once I reduced the feature vector length, detection of cars was much more accurate.
+* I would say however that the classifier can be improved by added training samples from other data sources.
+* The full search space can be further optimized. This was compensated by some search optimization on 9 frames out of 10 based on previously detected cars.
