@@ -16,6 +16,10 @@ The goals / steps of this project are the following:
 [image4]: ./output_images/extra40.png "Non car image"
 [image5]: ./output_images/converted_extra40.png "Non car image converted to YCrCb color space"
 [image6]: ./output_images/hog_extra40.png "HOG features extracted from non car image for first channel"
+[image7]: ./output_images/spatial_17.png "Spatial features extracted from the car image"
+[image8]: ./output_images/color_17.png "Color features extracted from the car image"
+[image9]: ./output_images/spatial_extra40.png "Spatial features extracted from the non car image"
+[image10]: ./output_images/color_extra40.png "Color features extracted from the non car image"
 [image1]: ./examples/car_not_car.png
 [image1]: ./examples/car_not_car.png
 [image1]: ./examples/car_not_car.png
@@ -31,7 +35,9 @@ The goals / steps of this project are the following:
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/513/view) Points
 
-Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+Here I will consider the rubric points individually and describe how I addressed each point in my implementation.
+
+All source code references are made on my Jupyter notebook [VehicleDetection-P5.ipynb](https://github.com/schambon77/CarND-Vehicle-Detection-P5/blob/master/VehicleDetection-P5.ipynb).
 
 ### Writeup / README
 
@@ -43,7 +49,9 @@ You're reading it!
 
 #### 1. Explain how (and identify where in your code) you extracted HOG features from the training images.
 
-The generic `get_hog_features` function allows the HOG features extraction from an input image according to the orientation, number of pixels per cell and number of cells per block parameters. 
+The generic `get_hog_features` function allows the HOG features extraction from an input image according to the orientation, number of pixels per cell and number of cells per block parameters.
+
+The code cell under the title "Extract features" contains the calls to the HOG feature extraction function.
 
 The parameters I used are:
 * Image color space: `YCrCb`
@@ -71,9 +79,30 @@ However I reduced cells per block from `2` to `1` in order to reduce the overall
 
 Finally, I extracted HOG features for all 3 channels in order to get maximum value of the car (or non car object) shapes in the different channels. 
 
-####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+#### 3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
 
-I trained a linear SVM using...
+In the "Extract features" code cell, I read all vehicles and non-vehicles images. For each I then call the function `single_img_features` which conveniently extracts the HOG features through the function previously mentioned, as well as spatial and color features.
+
+The parameters I used for the spatial features extraction through function `bin_spatial` are:
+* spatial_size: (8, 8)
+
+The parameters I used for the color features extraction through function `color_hist` are:
+* bins: 16
+* range: (0, 256)
+
+The parameters lower than the defaults are chosen in order to keep a reasonnable dimensionality of the feature vector.
+
+Here are visual examples of the 2 feature vectors extracted:
+
+![image1]
+![image7]
+![image8]
+
+![image4]
+![image9]
+![image10]
+
+The "Train classifier" code cell contains code to train an SVC classifier, with the default 'rbf' method, but a large C (1e8) and low gamma (4e-4) in order to improve accuracy.
 
 ###Sliding Window Search
 
